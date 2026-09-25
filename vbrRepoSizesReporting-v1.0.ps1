@@ -219,8 +219,12 @@ foreach ($repo in $repos.data.GetEnumerator() ) {
 		$volume = $path.split('/')[2]
 		$rpath = $path.Substring( ($path.indexof($volume) + $volume.length) )
 	}
-	else {                              # ie Linux  /<volume>/<path>
+	else {                              # ie Linux  /<volume>/<path> 
+		# check if volumes are mounted in /mnt if so include that in volume		
 		$volume = $path.split('/')[1]
+		if ( $volume -eq 'mnt' ) {
+			$volume = $path.split('/')[1] + '/' + $path.split('/')[2]
+		}
 		$rpath = $path.Substring($volume.length+1)
 	}
 	# { hostName : { volume : { capacityGB , freeGB , percFree , 'repos' : { repo : { path , usedSpaceGB }}}}}
@@ -344,7 +348,7 @@ $html_body = "<body>
 $trCount = 0
 $html_body += "<tr id=`"grey`">" # write first table row. 
 # hostname loop
-foreach ( $appliance in $collectedData.Keys  ) { 
+foreach ( $appliance in ($collectedData.Keys | sort ) ) { 
 	if ($appliance -eq 'rows') {
 		continue
 	}
@@ -371,7 +375,7 @@ foreach ( $appliance in $collectedData.Keys  ) {
 		
 		$free_perc = ''
 		if ( $collectedData.$appliance.$vol.percFree -le 10 ){
-			$free_perc = "class=`"warn`" "
+			$free_perc = "id=`"warn`" "
 		}
 		$html_body += "<td $($free_perc)rowspan=`"$($collectedData.$appliance.$vol.rows)`">$($collectedData.$appliance.$vol.percFree)%</td>`r`n"
 		#repo loop
@@ -413,7 +417,7 @@ if ( $sobrs.data.length -gt 0){
 	$trCount = 0
     $sobrCount = 0
     $html_body += "<tr id=`"grey`">" # write first table row.
-	foreach ( $sobr in $sobrData.keys ){
+	foreach ( $sobr in ($sobrData.keys | sort )){
 		if ( $sobr -eq 'rows'){
 			continue
 		}
@@ -471,7 +475,7 @@ if ( $sobrs.data.length -gt 0){
 			$sobrPerf_pc = [int](( $sobrPerf_f / $sobrPerf_c ) * 100)
 			$free_perc = ''
 			if ( $sobrPerf_pc -le 10 ){
-				$free_perc = "class=`"warn`" "
+				$free_perc = "id=`"warn`" "
 			}
 			$html_body += "<td $($free_perc)rowspan=`"$($sobrPerf_rows)`">$($sobrPerf_pc)%</td>`r`n"	# Free %
 			$html_body += $html_perf
@@ -528,7 +532,7 @@ if ( $sobrs.data.length -gt 0){
 			$sobrCap_pc = [int](( $sobrCap_f / $sobrCap_c ) * 100 )
 			$free_perc = ''
 			if ( $sobrCap_pc -le 10 ){
-				$free_perc = "class=`"warn`" "
+				$free_perc = "id=`"warn`" "
 			}
 			$html_body += "<td $($free_perc)rowspan=`"$($sobrCap_rows)`">$($sobrCap_pc)%</td>`r`n"	# Free %
 			$html_body += $html_cap
