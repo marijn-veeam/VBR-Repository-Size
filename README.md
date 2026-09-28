@@ -7,3 +7,4 @@ usage:
 2) Set the required variables in the file vbrRepoSizesReporting-v1.x.ps1. main variable is the VBR FQDN.
 3) run the script: .\vbrRepoSizesReporting-v1.0.ps1 .\password.cred to create the html report.
 
+![usage](https://github.com/marijn-veeam/VBR-Repository-Size/blob/main/usage.PNG)
